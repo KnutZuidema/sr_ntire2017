@@ -1,6 +1,7 @@
 import tensorflow as tf
 import data
 
+
 def dataset(hr_flist, lr_flist, scale_list):
     distort = True
     with open(hr_flist) as f:
@@ -22,6 +23,7 @@ def dataset(hr_flist, lr_flist, scale_list):
         lr_image_list.append(lr_image)
     lr_patches = data.image_to_patches(tf.concat(lr_image_list, 0))
     return tf.concat(hr_patches_list, 0), lr_patches
+
 
 def distort_image(image):
     image1 = tf.image.random_flip_left_right(image)

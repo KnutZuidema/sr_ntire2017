@@ -25,10 +25,10 @@ def build_model(x, scale, training, reuse):
         activation=None,
         name='up',
         reuse=reuse)
-    print x.get_shape().as_list()
+    print(x.get_shape().as_list())
     for i in range(5):
         shortcut = util.crop_by_pixel(x, 1)
-        #print shortcut.get_shape().as_list()
+        # print shortcut.get_shape().as_list()
         resblock = conv(
             x,
             hidden_size,

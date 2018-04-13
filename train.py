@@ -24,8 +24,8 @@ flags.DEFINE_boolean('mem_growth', True, 'If true, use gpu memory on demand.')
 
 data = __import__(FLAGS.data_name)
 model = __import__(FLAGS.model_name)
-if (data.resize == model.upsample):
-    print "Config Error"
+if data.resize == model.upsample:
+    print("Config Error")
     quit()
 
 with tf.Graph().as_default():
@@ -62,15 +62,15 @@ with tf.Graph().as_default():
         sess.run(init_local)
         if (tf.gfile.Exists(FLAGS.model_file_out) or
                 tf.gfile.Exists(FLAGS.model_file_out + '.index')):
-            print 'Model exists'
+            print('Model exists')
             quit()
         if (tf.gfile.Exists(FLAGS.model_file_in) or
                 tf.gfile.Exists(FLAGS.model_file_in + '.index')):
             saver.restore(sess, FLAGS.model_file_in)
-            print 'Model restored from ' + FLAGS.model_file_in
+            print('Model restored from ' + FLAGS.model_file_in)
         else:
             sess.run(init)
-            print 'Model initialized'
+            print('Model initialized')
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
         try:
@@ -78,15 +78,15 @@ with tf.Graph().as_default():
             while not coord.should_stop():
                 _, _, training_loss = sess.run(
                     [stage, optimizer, loss])
-                print training_loss, acc
+                print(training_loss, acc)
                 loss_acc += training_loss
                 acc += 1
-                if (acc % 100000 == 0):
+                if acc % 100000 == 0:
                     saver.save(sess, FLAGS.model_file_out + '-' + str(acc))
         except tf.errors.OutOfRangeError:
             print('Done training -- epoch limit reached')
         finally:
             coord.request_stop()
-        print 'Average loss: ' + str(loss_acc / acc)
+        print('Average loss: ' + str(loss_acc / acc))
         saver.save(sess, FLAGS.model_file_out)
-        print 'Model saved to ' + FLAGS.model_file_out
+        print('Model saved to ' + FLAGS.model_file_out)

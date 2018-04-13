@@ -1,5 +1,5 @@
-import Image, ImageChops
-import numpy as np
+import Image
+import ImageChops
 
 hr_flist = 'flist/hr.flist'
 lr_flist = 'flist/lrX2.flist'

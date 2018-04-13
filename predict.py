@@ -13,8 +13,8 @@ flags.DEFINE_string('model_file', 'tmp/model_conv', 'Directory to put the traini
 
 data = __import__(FLAGS.data_name)
 model = __import__(FLAGS.model_name)
-if (data.resize == model.upsample):
-    print "Config Error"
+if data.resize == model.upsample:
+    print("Config Error")
     quit()
 
 with tf.Graph().as_default():
@@ -30,7 +30,7 @@ with tf.Graph().as_default():
     lr_image = tf.expand_dims(lr_image, 0)
     lr_image_shape = tf.shape(lr_image)[1:3]
     hr_image_shape = lr_image_shape * FLAGS.scale
-    if (data.resize):
+    if data.resize:
         lr_image = util.resize_func(lr_image, hr_image_shape)
         lr_image = tf.reshape(lr_image, [1, hr_image_shape[0], hr_image_shape[1], 3])
     else:
@@ -38,8 +38,8 @@ with tf.Graph().as_default():
     lr_image_padded = util.pad_boundary(lr_image)
     hr_image = model.build_model(lr_image_padded - 0.5, FLAGS.scale, training=False, reuse=False)
     hr_image = util.crop_center(hr_image, hr_image_shape)
-    if (data.residual):
-        if (data.resize):
+    if data.residual:
+        if data.resize:
             hr_image += lr_image
         else:
             hr_image += util.resize_func(lr_image, hr_image_shape)
@@ -47,17 +47,17 @@ with tf.Graph().as_default():
     hr_image = tf.saturate_cast(hr_image, tf.uint8)
     hr_image = tf.reshape(hr_image, [hr_image_shape[0], hr_image_shape[1], 3])
     hr_image = tf.image.encode_png(hr_image)
-    
+
     init = tf.global_variables_initializer()
     init_local = tf.local_variables_initializer()
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(init_local)
-        if (tf.gfile.Exists(FLAGS.model_file) or tf.gfile.Exists(FLAGS.model_file + '.index')):
+        if tf.gfile.Exists(FLAGS.model_file) or tf.gfile.Exists(FLAGS.model_file + '.index'):
             saver.restore(sess, FLAGS.model_file)
-            print 'Model restored from ' + FLAGS.model_file
+            print('Model restored from ' + FLAGS.model_file)
         else:
-            print 'Model not found'
+            print('Model not found')
             exit()
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)

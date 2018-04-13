@@ -14,8 +14,8 @@ flags.DEFINE_string('model_file', 'tmp/model_conv', 'Directory to put the traini
 
 data = __import__(FLAGS.data_name)
 model = __import__(FLAGS.model_name)
-if (data.resize == model.upsample):
-    print "Config Error"
+if data.resize == model.upsample:
+    print("Config Error")
     quit()
 
 with tf.Graph().as_default():
@@ -34,7 +34,7 @@ with tf.Graph().as_default():
     lr_image = tf.expand_dims(lr_image, 0)
     lr_image_shape = tf.shape(lr_image)[1:3]
     hr_image_shape = tf.shape(hr_image)[1:3]
-    if (data.resize):
+    if data.resize:
         lr_image = util.resize_func(lr_image, hr_image_shape)
         lr_image = tf.reshape(lr_image, [1, hr_image_shape[0], hr_image_shape[1], 3])
     else:
@@ -42,8 +42,8 @@ with tf.Graph().as_default():
     lr_image_padded = util.pad_boundary(lr_image)
     sr_image = model.build_model(lr_image_padded - 0.5, FLAGS.scale, training=False, reuse=False)
     sr_image = util.crop_center(sr_image, hr_image_shape)
-    if (data.residual):
-        if (data.resize):
+    if data.residual:
+        if data.resize:
             sr_image += lr_image
         else:
             sr_image += util.resize_func(lr_image, hr_image_shape)
@@ -63,11 +63,11 @@ with tf.Graph().as_default():
     acc = 0
     with tf.Session() as sess:
         sess.run(init_local)
-        if (tf.gfile.Exists(FLAGS.model_file) or tf.gfile.Exists(FLAGS.model_file + '.index')):
+        if tf.gfile.Exists(FLAGS.model_file) or tf.gfile.Exists(FLAGS.model_file + '.index'):
             saver.restore(sess, FLAGS.model_file)
-            print 'Model restored from ' + FLAGS.model_file
+            print('Model restored from ' + FLAGS.model_file)
         else:
-            print 'Model not found'
+            print('Model not found')
             exit()
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
@@ -75,7 +75,7 @@ with tf.Graph().as_default():
             for hr_filename in hr_filename_list:
                 error_per_image = sess.run(error)
                 psnr_per_image = -10.0 * math.log10(error_per_image)
-                print error_per_image, psnr_per_image
+                print(error_per_image, psnr_per_image)
                 error_acc += error_per_image
                 psnr_acc += psnr_per_image
                 acc += 1
@@ -83,4 +83,4 @@ with tf.Graph().as_default():
             print('Done validation -- epoch limit reached')
         finally:
             coord.request_stop()
-        print error_acc / acc, psnr_acc / acc
+        print(error_acc / acc, psnr_acc / acc)
