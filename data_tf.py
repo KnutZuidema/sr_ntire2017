@@ -1,5 +1,5 @@
 import tensorflow as tf
-import data
+import util
 
 
 def dataset(hr_flist, lr_flist, scale_list):
@@ -15,13 +15,13 @@ def dataset(hr_flist, lr_flist, scale_list):
         hr_image = distort_image(hr_image)
     else:
         hr_image = tf.expand_dims(hr_image, 0)
-    hr_patches = data.image_to_patches(hr_image)
+    hr_patches = util.image_to_patches(hr_image)
     hr_patches_list = [hr_patches] * len(scale_list)
     lr_image_list = []
     for scale in scale_list:
         lr_image = tf.image.resize_bicubic(tf.image.resize_bicubic(hr_image, tf.shape(hr_image)[1:3] / scale), tf.shape(hr_image)[1:3])
         lr_image_list.append(lr_image)
-    lr_patches = data.image_to_patches(tf.concat(lr_image_list, 0))
+    lr_patches = util.image_to_patches(tf.concat(lr_image_list, 0))
     return tf.concat(hr_patches_list, 0), lr_patches
 
 
