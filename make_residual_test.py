@@ -1,5 +1,5 @@
-import Image
-import ImageChops
+from PIL import Image
+from PIL import ImageChops
 
 hr_flist = 'flist/set5_predict.flist'
 lr_flist = 'flist/set5_lrX2.flist'
